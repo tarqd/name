@@ -5,11 +5,16 @@
 ## Installation
 
   Install with [component(1)](http://component.io):
-
+  
     $ component install ilsken/name
+    
+  Install with [component(1)](http://component.io):
+  
+    $ npm install --save private-name
 
 ## Usage (with component or node.js)
 ```javascript
+// require('private-name) for node
 var Name = require('name')
 var myObject = {}
 // you can also use new Name('something') to create a friendlier name for debugging tools which can see hidden properties
