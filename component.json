@@ -1,9 +1,9 @@
 {
   "name": "name",
   "repo": "ilsken/name",
-  "description": "Simple shim for Private Names",
-  "version": "0.0.1",
-  "keywords": [],
+  "description": "Simple shim for ES.next Private Names",
+  "version": "0.1.0",
+  "keywords": ["es6", "es.next", "shim", "private name", "hidden"],
   "dependencies": {},
   "development": {},
   "license": "MIT",

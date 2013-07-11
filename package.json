@@ -1,14 +1,14 @@
 {
   "name": "private-name",
-  "version": "0.0.1",
-  "description": "ES.next private name object shim",
+  "version": "0.1.1",
+  "description": "Simple shim for ES.next Private Names",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
     "type": "git",
-    "url": "http://github.com/ilsken/name"
+    "url": "https://github.com/ilsken/name.git"
   },
   "keywords": [
     "private",
