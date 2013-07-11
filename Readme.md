@@ -8,7 +8,7 @@
   
     $ component install ilsken/name
     
-  Install with [component(1)](http://component.io):
+  Install with [npm](https://npmjs.org/):
   
     $ npm install --save private-name
 
