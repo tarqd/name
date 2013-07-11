@@ -1,6 +1,6 @@
 # name
 
-  A very simple ES.next shim. It works fairly well without any shims (though it does need to create one hidden property on Object.prototype but it's much less intrusive than replacing functions. The variable name is random and uses unicode characters so the chances of conflicts are slim to none)
+  A very simple ES.next shim. It works fairly well without any monkey-patching (though it does need to create one non-enumerable property on Object.prototype but it's much less intrusive than replacing functions. The variable name is random and uses unicode characters so the chances of conflicts are slim to none)
 
 ## Installation
 
