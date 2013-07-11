@@ -8,7 +8,6 @@ var id 							= 0
 	, prefix 					= '\u2063\u2063\u2063'
 	, expando 				= generateName('NameHelper')
 	, currentProperty = undefined
-	, storage 				= generateName('NameStorage')
 	, defineProperty 	= Object.defineProperty
 	, exports 				= module.exports = Name
 
@@ -29,11 +28,10 @@ function Name(publicName) {
 		return expando
 	}
 
-	this.defineProperty = function(obj, prop, desc){
-		init(obj)
-		if(typeof desc.get == 'function') createContext(desc.get)
-		if(typeof desc.get == 'function') createContext(desc.set)
-		return defineProperty(obj[storage], prop, desc)
+	this.define = function(obj, desc){
+		// hidden properties can never enumerable
+		desc.enumerable = false
+		return defineProperty(obj, name, desc)
 	}
 }
 
@@ -52,17 +50,18 @@ function isPrivate(name){
  * This is where the magic happens
  * Define a hidden property on Object.prototype 
  * Because Name#toString returns the expando string this is called every time a private name is accessed
+ * Using Object.prototype allows .hasOwnProperty(name) to return false without a shim
  */
 defineProperty(Object.prototype, expando, {
 	enumerable: false,
 	configurable: false,
 	get: function() {
 		var name = init(this)
-		return name && this[storage][name]
+		return name && this[name]
 	},
 	set: function(value) {
-		var name = init(this)
-		if(name) this[storage][name] = value
+		var name = init(this, true)
+		if(name) this[name] = value
 	}
 })
 
@@ -82,36 +81,25 @@ function generateName(str) {
 }
 
 /**
- * Creates a wrapper function to fix the context for getters/setters
- * @param  {Function} fn function to wrap
- * @return {Function} wrapped function      
- */
-// new Function returns a function because it doesn't have to worry about this closures scope
-var createWrapper = new Function('fn', 'return fn.bind(this.context)')
-function createContext(fn) {
-	return createWrapper(fn)
-}
-/**
- * Helper method, unsets the currentProperty flag and creates storage if nessarry
+ * Helper method, unsets the currentProperty flag and defines the property if nessarry
  * @param  {Object} self 
+ * @param {Boolean} define if set to true, a property will be created if it does not exist
  * @return {String} name of the property or undefined if there was an error     
  */
-function init(self) {
+function init(self, define) {
 	var name = currentProperty
 	currentProperty = undefined
 	if(typeof self.hasOwnProperty != 'function') return undefined
-	if(!self.hasOwnProperty(storage))
-		createStorage(self, storage)
+	// make sure all hidden properties are non-enumerable
+	if(define && name && name != expando && !self.hasOwnProperty(name)) {
+		defineProperty(self, name, {
+			configurable: true,
+			enumerable: false,
+			writable: true,
+			value: undefined
+		})
+	}
 	return name
-}
-
-/**
- * Defines a new property on the object to store hidden fields
- * @param  {Object} self 
- * @param  {String} name 
- */
-function createStorage(self, name) {
-	defineProperty(self, name, {enumerable: false, configurable: true, value: {context: self}, writable: false})
 }
 
 
