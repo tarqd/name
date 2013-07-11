@@ -37,6 +37,7 @@ console.log(myObject[hiddenProperty]) // "foo"
 console.log(myObject.hasOwnProperty(hiddenProperty)) // false
 
 console.log(Object.keys(myObject)) // []
+```
 
 ## Usage in the browser (without component)
 ```html
@@ -50,6 +51,24 @@ console.log(Object.keys(myObject)) // []
 
 While this shim for the most part works without any monkey-patching there are currently a couple ways to leak the private properties names. If you want to fix those leaks you can use the patches below
 
+### Object.defineProperty
+Because `myHiddenName.toString()` doesn't return the actual name of the property but rather the name of our helper property on `Object.prototype`, you will not be able to use `Object.defineProperty` directly
+You can use the following helper method instead
+```javascript
+var hidden = new Name()
+hidden.define(obj, {
+	get: function(){ return 'bla'}
+})
+```
+Or you can apply the following patch
+```javascript
+var def = Object.defineProperty
+function defineProperty(obj, prop, desc){
+   if(prop instanceof Name) return prop.define(obj, desc)
+   else return def(obj, prop, desc)
+}
+Object.defineProperty = defineProperty
+```
 #### Object.getOwnPropertyNames(object) 
 `Object.getOwnPropertyNames` will leak the private names of the variables. Because they use invisble unicode characters the chances of conflict are very slim but if you really want to make sure no one else can access the hidden variable names you can apply this patch
 ```javascript
@@ -60,7 +79,7 @@ function getOwnPropertyNames(obj){
 Object.getOwnPropertyNames = getOwnPropertyNames
 ```
 
-### Object.hasOwnProperty(Object.prototype, hiddenProperty)
+#### Object.hasOwnProperty(Object.prototype, hiddenProperty)
 If you define hidden properties on Object.prototype the method we use to hide doesn't work. I don't know why you would define hidden properties on the prototype but just in case here's how you'd patch this leak
 
 ```javascript
@@ -68,6 +87,7 @@ var has = Object.hasOwnProperty
 function hasOwnProperty(obj, prop){
 	return Name.isPublic(prop) && has(obj, prop)
 }
+Object.hasOwnProperty = hasOwnProperty
 ```
 
 
